@@ -84,7 +84,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
       gap: 10px;
       margin-top: 18px;
     }
@@ -483,6 +483,11 @@
       font-size: 13px;
     }
 
+    .marker.shengjian {
+      background: var(--blue);
+      font-size: 13px;
+    }
+
     @media (max-width: 880px) {
       .app {
         grid-template-columns: 1fr;
@@ -570,6 +575,10 @@
             <strong id="paomoCount">0</strong>
             <span>泡馍</span>
           </div>
+          <div class="metric">
+            <strong id="shengjianCount">0</strong>
+            <span>生煎</span>
+          </div>
         </div>
       </section>
 
@@ -577,6 +586,7 @@
         <div class="city-tabs" role="group" aria-label="按城市筛选">
           <button class="city-tab" type="button" data-city="macau" aria-pressed="true">澳门</button>
           <button class="city-tab" type="button" data-city="xian" aria-pressed="false">西安</button>
+          <button class="city-tab" type="button" data-city="shanghai" aria-pressed="false">上海</button>
         </div>
         <div class="search-row">
           <label class="search-box">
@@ -592,13 +602,14 @@
           <button class="group-tab" type="button" data-group="bread" aria-pressed="false">面包</button>
           <button class="group-tab" type="button" data-group="pizza" aria-pressed="false">Pizza</button>
           <button class="group-tab" type="button" data-group="paomo" aria-pressed="false">泡馍</button>
+          <button class="group-tab" type="button" data-group="shengjian" aria-pressed="false">生煎</button>
         </div>
         <div class="filters" id="categoryFilters" role="group" aria-label="按类型筛选"></div>
       </section>
 
       <section class="list" id="placeList" aria-live="polite"></section>
       <p class="empty" id="emptyState">没有匹配的店铺。</p>
-      <p class="status-line" id="limitStatus">当前显示：面包 8 家，Pizza 12 家，泡馍 0 家。每类最多显示 20 家。</p>
+      <p class="status-line" id="limitStatus">当前显示：面包 8 家，Pizza 12 家，泡馍 0 家，生煎 0 家。每类最多显示 20 家。</p>
       <p class="footnote">价格为公开资料整理的参考价，现场价格和供应以门店为准。含“参考定位”的标记为按地址定位到楼宇或街区。</p>
     </aside>
 
@@ -617,12 +628,14 @@
     const MAX_PER_GROUP = 20;
     const cityLabels = {
       macau: "澳门",
-      xian: "西安"
+      xian: "西安",
+      shanghai: "上海"
     };
 
     const cityGroups = {
       macau: ["bread", "pizza"],
-      xian: ["paomo"]
+      xian: ["paomo"],
+      shanghai: ["shengjian"]
     };
 
     const cityBadges = {
@@ -633,18 +646,24 @@
       xian: {
         title: "西安泡馍精选点",
         subtitle: "切到西安后只显示泡馍/小炒泡馍，最多 20 家。"
+      },
+      shanghai: {
+        title: "上海生煎精选点",
+        subtitle: "切到上海后只显示生煎馆，最多 20 家。"
       }
     };
 
     const cityViews = {
       macau: { center: [22.174, 113.548], zoom: 13 },
-      xian: { center: [34.262, 108.939], zoom: 14 }
+      xian: { center: [34.262, 108.939], zoom: 14 },
+      shanghai: { center: [31.231, 121.472], zoom: 13 }
     };
 
     const groupLabels = {
       bread: "面包",
       pizza: "Pizza",
-      paomo: "泡馍"
+      paomo: "泡馍",
+      shengjian: "生煎"
     };
 
     const places = [
@@ -1203,6 +1222,366 @@
         accuracy: "街区定位",
         sourceName: "本地攻略汇总",
         sourceUrl: "https://m.xa.bendibao.com/meishi/51898_3.shtm"
+      },
+      {
+        id: "shengjian-dahuchun",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 1,
+        name: "大壶春",
+        category: "老字号",
+        area: "黄浦",
+        items: "鲜肉生煎、清水派生煎",
+        description: "上海生煎老字号，皮偏厚、底脆、汤汁不靠大量油汤取胜，是清水派生煎代表。",
+        address: "上海市黄浦区四川中路136号",
+        price: "人均约 ¥18；鲜肉生煎按门店现价",
+        lat: 31.2367029,
+        lng: 121.4847725,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-dongtaixiang",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 2,
+        name: "东泰祥生煎馆",
+        category: "老字号",
+        area: "黄浦",
+        items: "鲜肉生煎、锅贴、汤面",
+        description: "半发酵皮和经典鲜肉馅是特色，位置靠近人民广场，适合和市中心行程合并。",
+        address: "上海市黄浦区重庆北路188号",
+        price: "人均约 ¥15；生煎单份以门店现价",
+        lat: 31.2281332,
+        lng: 121.4656945,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-shucaiji",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 3,
+        name: "舒蔡记",
+        category: "本地口碑",
+        area: "黄浦",
+        items: "鲜肉生煎、汤包、上海点心",
+        description: "浙江中路一带的本地口碑小店，生煎底脆、馅心饱满，适合在南京路附近顺路吃。",
+        address: "上海市黄浦区浙江中路120号附近",
+        price: "人均约 ¥35",
+        lat: 31.2345518,
+        lng: 121.4750292,
+        accuracy: "街道定位",
+        sourceName: "上海生煎推荐",
+        sourceUrl: "https://www.sohu.com/a/611892678_121123850"
+      },
+      {
+        id: "shengjian-chenxingji",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 4,
+        name: "陈兴记生煎",
+        category: "连锁",
+        area: "长宁",
+        items: "鲜肉生煎、无锡风味生煎、汤包",
+        description: "凌空 SOHO 一带的生煎选择，口味偏甜鲜，适合办公区午餐或轻便一餐。",
+        address: "上海市长宁区金钟路968号凌空SOHO B1层",
+        price: "人均约 ¥25",
+        lat: 31.2220513,
+        lng: 121.3583227,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-ade",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 5,
+        name: "阿德生煎",
+        category: "本地口碑",
+        area: "徐汇",
+        items: "鲜肉生煎、牛肉汤、双档汤",
+        description: "龙华一带的人气老店，生煎个头不浮夸，底壳焦香，适合搭一碗汤吃。",
+        address: "上海市徐汇区龙华西路219号",
+        price: "人均约 ¥15",
+        lat: 31.1749955,
+        lng: 121.4435949,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-fengyu",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 6,
+        name: "丰裕生煎",
+        category: "连锁",
+        area: "黄浦",
+        items: "鲜肉生煎、锅贴、小馄饨",
+        description: "上海老牌连锁生煎，门店多、出品稳定，适合想吃传统鲜肉生煎的人。",
+        address: "上海市黄浦区瑞金二路41号附近",
+        price: "人均约 ¥30",
+        lat: 31.2196820,
+        lng: 121.4598176,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-yangs",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 7,
+        name: "小杨生煎",
+        category: "连锁",
+        area: "黄浦",
+        items: "鲜肉生煎、虾仁生煎、双拼生煎",
+        description: "游客友好、分店多的上海生煎代表，汤汁足，适合第一次来上海快速打卡。",
+        address: "上海市黄浦区黄河路97号附近",
+        price: "人均约 ¥26",
+        lat: 31.2366304,
+        lng: 121.4660009,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-guangtou",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 8,
+        name: "光头生煎",
+        category: "本地口碑",
+        area: "虹口",
+        items: "鲜肉生煎、牛肉汤",
+        description: "虹口一带的排队生煎小店，底部煎得脆，适合专门去吃一份本地小吃。",
+        address: "上海市虹口区山阴路139-141号附近",
+        price: "人均约 ¥22",
+        lat: 31.2684051,
+        lng: 121.4804068,
+        accuracy: "OSM 节点",
+        sourceName: "上海生煎推荐",
+        sourceUrl: "https://www.sohu.com/a/611892678_121123850"
+      },
+      {
+        id: "shengjian-xuji",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 9,
+        name: "许记生煎",
+        category: "本地口碑",
+        area: "静安",
+        items: "鲜肉生煎、汤面、馄饨",
+        description: "共和新路附近的社区型生煎店，价格亲民，适合在北上海顺路吃。",
+        address: "上海市静安区共和新路4701号附近",
+        price: "人均约 ¥30",
+        lat: 31.2931092,
+        lng: 121.4460522,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-jianzisheng",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 10,
+        name: "煎子生",
+        category: "商场店",
+        area: "黄浦",
+        items: "鲜肉生煎、特色生煎、咖喱牛肉汤",
+        description: "新世界城里的生煎店，位置方便，适合人民广场周边逛街时快速解决一餐。",
+        address: "上海市黄浦区南京西路2-68号新世界城B1层",
+        price: "人均约 ¥19",
+        lat: 31.2327912,
+        lng: 121.4624390,
+        accuracy: "商圈定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-liufu",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 11,
+        name: "六福面道生煎馆",
+        category: "生煎+面",
+        area: "徐汇",
+        items: "鲜肉生煎、面条、小馄饨",
+        description: "徐家汇附近的生煎面馆，适合想把生煎和一碗面一起吃的人。",
+        address: "上海市徐汇区广元西路88号附近",
+        price: "人均约 ¥21",
+        lat: 31.1976456,
+        lng: 121.4292009,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-wuming",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 12,
+        name: "无名生煎",
+        category: "本地口碑",
+        area: "浦东",
+        items: "鲜肉生煎、葱油拌面、汤品",
+        description: "昌里路一带的社区生煎馆，胜在接地气，适合在世博/浦东南部顺路尝试。",
+        address: "上海市浦东新区昌里东路516号附近",
+        price: "人均约 ¥17",
+        lat: 31.1822496,
+        lng: 121.5124769,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-asan",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 13,
+        name: "阿三生煎",
+        category: "本地口碑",
+        area: "闵行",
+        items: "鲜肉生煎、虾仁生煎、牛肉汤",
+        description: "闵行人气生煎店，离市中心稍远，但适合住在闵行或虹桥一带时安排。",
+        address: "上海市闵行区龙茗路2676号附近",
+        price: "人均约 ¥22",
+        lat: 31.1456121,
+        lng: 121.3803635,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-jinbiao",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 14,
+        name: "金彪生煎王",
+        category: "本地口碑",
+        area: "虹口",
+        items: "鲜肉生煎、牛肉汤、咖喱汤",
+        description: "乍浦路附近的经典生煎店，皮底焦香，适合外滩以北顺路吃。",
+        address: "上海市虹口区乍浦路336号附近",
+        price: "人均约 ¥28",
+        lat: 31.2521597,
+        lng: 121.4824714,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-sanliangchun",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 15,
+        name: "三两春",
+        category: "生煎+面",
+        area: "浦东",
+        items: "鲜肉生煎、面条、馄饨",
+        description: "崂山路附近的生煎面馆，适合陆家嘴/浦东中心区域想吃上海点心时选择。",
+        address: "上海市浦东新区崂山路664号",
+        price: "人均约 ¥22",
+        lat: 31.2240952,
+        lng: 121.5207692,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-xiaoyan",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 16,
+        name: "晓燕生煎",
+        category: "本地口碑",
+        area: "长宁",
+        items: "鲜肉生煎、牛肉汤",
+        description: "定西路上的口碑生煎店，适合长宁、新华路一带的本地小吃路线。",
+        address: "上海市长宁区定西路1226号附近",
+        price: "人均约 ¥20",
+        lat: 31.2087069,
+        lng: 121.4193505,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-dingyouming",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 17,
+        name: "鼎有名",
+        category: "本地口碑",
+        area: "普陀",
+        items: "鲜肉生煎、特色生煎、汤品",
+        description: "普陀区的社区型生煎馆，适合在长风公园/金沙江路附近顺路尝试。",
+        address: "上海市普陀区怒江路380号附近",
+        price: "人均约 ¥36",
+        lat: 31.2367293,
+        lng: 121.3940624,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-wujiandao",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 18,
+        name: "吾煎道生煎馆",
+        category: "本地口碑",
+        area: "虹口",
+        items: "鲜肉生煎、双拼生煎、汤面",
+        description: "中山北一路一带的生煎馆，适合虹口、鲁迅公园周边觅食。",
+        address: "上海市虹口区中山北一路1222号附近",
+        price: "人均约 ¥25",
+        lat: 31.2752083,
+        lng: 121.4728329,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-guangmingcun",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 19,
+        name: "光明邨大酒家",
+        category: "老字号",
+        area: "黄浦",
+        items: "鲜肉生煎、熟食点心、排队小吃",
+        description: "淮海路老字号，生煎之外熟食和点心也强，适合顺手买伴手点心。",
+        address: "上海市黄浦区淮海中路588号",
+        price: "人均约 ¥49",
+        lat: 31.2223979,
+        lng: 121.4631630,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "shengjian-qiaosanji",
+        city: "shanghai",
+        group: "shengjian",
+        rank: 20,
+        name: "敲三记生煎馒头",
+        category: "商场店",
+        area: "徐汇",
+        items: "鲜肉生煎、特色生煎、汤品",
+        description: "徐家汇商圈内的生煎店，适合逛商场时快速吃一份热生煎。",
+        address: "上海市徐汇区漕溪北路339号百脑汇二期B1层",
+        price: "人均约 ¥21",
+        lat: 31.1930289,
+        lng: 121.4334635,
+        accuracy: "街道定位",
+        sourceName: "搜狐上海生煎榜单",
+        sourceUrl: "https://www.sohu.com/a/366033225_494737"
       }
     ];
 
@@ -1264,7 +1643,8 @@
       const labels = {
         bread: "B",
         pizza: "P",
-        paomo: "馍"
+        paomo: "馍",
+        shengjian: "煎"
       };
       const label = labels[item.group] || "?";
       return L.divIcon({
@@ -1429,12 +1809,14 @@
       const breadCount = visible.filter((item) => item.group === "bread").length;
       const pizzaCount = visible.filter((item) => item.group === "pizza").length;
       const paomoCount = visible.filter((item) => item.group === "paomo").length;
+      const shengjianCount = visible.filter((item) => item.group === "shengjian").length;
       document.getElementById("shopCount").textContent = visible.length;
       document.getElementById("breadCount").textContent = breadCount;
       document.getElementById("pizzaCount").textContent = pizzaCount;
       document.getElementById("paomoCount").textContent = paomoCount;
+      document.getElementById("shengjianCount").textContent = shengjianCount;
       document.getElementById("limitStatus").textContent =
-        `当前显示：面包 ${breadCount} 家，Pizza ${pizzaCount} 家，泡馍 ${paomoCount} 家。每类最多显示 ${MAX_PER_GROUP} 家。`;
+        `当前显示：面包 ${breadCount} 家，Pizza ${pizzaCount} 家，泡馍 ${paomoCount} 家，生煎 ${shengjianCount} 家。每类最多显示 ${MAX_PER_GROUP} 家。`;
     }
 
     function updateCityBadge() {
