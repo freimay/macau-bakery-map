@@ -279,6 +279,32 @@
       background: #fde6d7;
     }
 
+    .review-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      margin-top: 10px;
+      padding: 5px 9px;
+      border: 1px solid rgba(22, 163, 74, .24);
+      border-radius: 999px;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.2;
+      background: rgba(22, 163, 74, .08);
+    }
+
+    .review-line i {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+    }
+
+    .review-line + .desc {
+      margin-top: 10px;
+    }
+
     .tag-row {
       display: flex;
       flex-wrap: wrap;
@@ -421,6 +447,24 @@
       font-size: 12px;
       font-weight: 800;
       background: #fde6d7;
+    }
+
+    .popup-review {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(22, 163, 74, .09);
+    }
+
+    .popup-review i {
+      width: 15px;
+      height: 15px;
     }
 
     .popup-actions {
@@ -610,7 +654,7 @@
       <section class="list" id="placeList" aria-live="polite"></section>
       <p class="empty" id="emptyState">没有匹配的店铺。</p>
       <p class="status-line" id="limitStatus">当前显示：面包 8 家，Pizza 12 家，泡馍 0 家，生煎 0 家。每类最多显示 20 家。</p>
-      <p class="footnote">价格为公开资料整理的参考价，现场价格和供应以门店为准。含“参考定位”的标记为按地址定位到楼宇或街区。</p>
+      <p class="footnote">价格为公开资料整理的参考价，现场价格和供应以门店为准。大陆门店优先显示可公开访问的大众点评评分，未精确匹配分店则不显示评分。</p>
     </aside>
 
     <section class="map-wrap" aria-label="城市美食地图">
@@ -664,6 +708,177 @@
       pizza: "Pizza",
       paomo: "泡馍",
       shengjian: "生煎"
+    };
+
+    const dianpingReviews = {
+      "paomo-mahong": {
+        score: "4.3",
+        avg: "¥30/人",
+        branch: "清真·马洪小炒泡馍馆(钟楼回民街店)",
+        dish: "普通羊肉泡馍 ¥30",
+        url: "https://m.dianping.com/shop/5364868?msource=applemaps",
+        checked: "2026-07"
+      },
+      "paomo-laomijia-dayu": {
+        score: "4.2",
+        avg: "¥28/人",
+        branch: "老米家大雨泡馍",
+        dish: "普通羊肉泡馍 ¥38",
+        url: "https://m.dianping.com/shop/79615443?msource=applemaps",
+        checked: "2026-07"
+      },
+      "paomo-liuxin": {
+        score: "4.1",
+        avg: "¥29/人",
+        branch: "刘信牛羊肉小炒泡馍(回民街店)",
+        dish: "羊肉泡馍 ¥30",
+        url: "https://m.dianping.com/shop/551242?msource=applemaps",
+        checked: "2026-07"
+      },
+      "paomo-yizhenlou": {
+        score: "4.1",
+        avg: "¥35/人",
+        branch: "清真·一真楼",
+        dish: "半成品优质羊肉泡馍 ¥59",
+        url: "https://m.dianping.com/shop/2046031?msource=applemaps",
+        checked: "2026-07"
+      },
+      "paomo-laoliujia": {
+        score: "4.2",
+        avg: "¥32/人",
+        branch: "老刘家泡馍·陕西老字号(钟楼广济街店)",
+        dish: "优质羊肉泡馍 ¥45",
+        url: "https://m.dianping.com/shop/2103484?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-dahuchun": {
+        score: "3.9",
+        avg: "¥27/人",
+        branch: "大壶春生煎(四川中路店)",
+        dish: "生煎馒头 ¥10",
+        url: "https://m.dianping.com/shop/32643953?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-dongtaixiang": {
+        score: "4.1",
+        avg: "¥30/人",
+        branch: "东泰祥生煎馆(重庆北路店)",
+        dish: "特色生煎",
+        url: "https://m.dianping.com/shop/3670618?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-shucaiji": {
+        score: "3.9",
+        avg: "¥23/人",
+        branch: "舒蔡记生煎菜饭(浙江中路店)",
+        dish: "生煎馒头 ¥8",
+        url: "https://m.dianping.com/shop/127736823?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-yangs": {
+        score: "3.9",
+        avg: "¥27/人",
+        branch: "小杨生煎(黄河路店)",
+        dish: "小杨生煎",
+        url: "https://m.dianping.com/shop/2315890?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-guangtou": {
+        score: "3.6",
+        avg: "¥20/人",
+        branch: "光头生煎(山阴路店)",
+        dish: "鲜肉生煎",
+        url: "https://m.dianping.com/shop/4298467?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-asan": {
+        score: "3.8",
+        avg: "¥17/人",
+        branch: "阿三生煎(龙茗路店)",
+        dish: "鲜肉生煎",
+        url: "https://m.dianping.com/shop/3132223?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-jinbiao": {
+        score: "3.9",
+        avg: "¥18/人",
+        branch: "金彪生煎王(乍浦路店)",
+        dish: "鲜肉生煎",
+        url: "https://m.dianping.com/shop/3017311?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-sanliangchun": {
+        score: "4.1",
+        avg: "¥26/人",
+        branch: "三两春(崂山路店)",
+        dish: "生煎馒头",
+        url: "https://m.dianping.com/shop/4542412?msource=applemaps",
+        checked: "2026-07"
+      },
+      "shengjian-xiaoyan": {
+        score: "3.9",
+        avg: "¥20/人",
+        branch: "晓燕生煎(定西路店)",
+        dish: "鲜肉生煎",
+        url: "https://m.dianping.com/shop/23067150?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-bella-napoli": {
+        score: "4.3",
+        avg: "¥205/人",
+        branch: "Bella Napoli(长乐路店)",
+        dish: "双拼披萨 ¥140",
+        url: "https://m.dianping.com/shop/4077178?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-la-strada": {
+        score: "4.3",
+        avg: "¥150/人",
+        branch: "La Strada(安福路店)",
+        dish: "香肠火腿披萨 ¥118",
+        url: "https://m.dianping.com/shop/3333280?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-zup": {
+        score: "4.4",
+        avg: "¥91/人",
+        branch: "ZUP PIZZA BAR",
+        dish: "披萨",
+        url: "https://m.dianping.com/shop/1286361941?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-palatino": {
+        score: "4.6",
+        avg: "¥202/人",
+        branch: "PALATINO ROMAN CUISINE意大利罗马餐厅(长乐路店)",
+        dish: "招牌披萨 ¥138",
+        url: "https://m.dianping.com/shop/5363866?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-alla-torre": {
+        score: "4.7",
+        avg: "¥137/人",
+        branch: "乐意坊Alla Torre意大利手工披萨(陆家嘴旗舰店)",
+        dish: "披萨",
+        url: "https://m.dianping.com/shop/3262375?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-mercato": {
+        score: "4.7",
+        avg: "¥600/人",
+        branch: "Mercato by Jean-Georges意大利餐厅",
+        dish: "黑松露披萨 ¥228",
+        url: "https://m.dianping.com/shop/6119146?msource=applemaps",
+        checked: "2026-07"
+      },
+      "pizza-shanghai-scarpetta": {
+        score: "4.6",
+        avg: "¥654/人",
+        branch: "Scarpetta Trattoria食光·意大利餐厅",
+        dish: "披萨",
+        url: "https://m.dianping.com/shop/6054945?msource=applemaps",
+        checked: "2026-07"
+      }
     };
 
     const places = [
@@ -1983,6 +2198,45 @@
         .replace(/'/g, "&#039;");
     }
 
+    function isMainlandPlace(item) {
+      return ["xian", "shanghai"].includes(placeCity(item));
+    }
+
+    function reviewFor(item) {
+      return dianpingReviews[item.id] || null;
+    }
+
+    function reviewSummary(item) {
+      const review = reviewFor(item);
+      if (!review) return "";
+      return `大众点评 ${review.score} · ${review.avg}`;
+    }
+
+    function reviewSearchText(item) {
+      const review = reviewFor(item);
+      if (!review) return "";
+      return `${review.score} ${review.avg} ${review.branch} ${review.dish} 大众点评`;
+    }
+
+    function reviewBadge(item) {
+      const summary = reviewSummary(item);
+      if (!summary) return "";
+      return `<div class="review-line">
+        <i data-lucide="star" aria-hidden="true"></i>${escapeHtml(summary)}
+      </div>`;
+    }
+
+    function reviewBlock(item) {
+      const review = reviewFor(item);
+      if (!review) return "";
+      const dish = review.dish ? `；推荐菜：${review.dish}` : "";
+      return `<div class="popup-review">
+        <i data-lucide="star" aria-hidden="true"></i>
+        大众点评 ${escapeHtml(review.score)} · ${escapeHtml(review.avg)}
+      </div>
+      <p><strong>点评来源：</strong>${escapeHtml(review.branch)}，${escapeHtml(review.checked)}整理${escapeHtml(dish)}</p>`;
+    }
+
     function byRank(a, b) {
       if (placeCity(a) !== placeCity(b)) return placeCity(a).localeCompare(placeCity(b));
       if (a.group !== b.group) {
@@ -2028,6 +2282,13 @@
     }
 
     function sourceLink(item) {
+      const review = reviewFor(item);
+      if (isMainlandPlace(item)) {
+        if (!review || !review.url) return "";
+        return `<a class="link-button secondary" href="${review.url}" target="_blank" rel="noreferrer">
+          <i data-lucide="external-link" aria-hidden="true"></i>点评
+        </a>`;
+      }
       if (!item.sourceUrl) return "";
       return `<a class="link-button secondary" href="${item.sourceUrl}" target="_blank" rel="noreferrer">
         <i data-lucide="external-link" aria-hidden="true"></i>来源
@@ -2043,6 +2304,7 @@
           <p><strong>地址：</strong>${escapeHtml(item.address)}</p>
           <p><strong>定位：</strong>${escapeHtml(item.accuracy)}</p>
           <span class="popup-price">${escapeHtml(item.price)}</span>
+          ${reviewBlock(item)}
           <div class="popup-actions">
             <a class="link-button" href="${navUrl(item)}" target="_blank" rel="noreferrer">
               <i data-lucide="navigation" aria-hidden="true"></i>Google
@@ -2075,6 +2337,7 @@
           <span class="tag area">${escapeHtml(item.area)}</span>
           <span class="tag area">${escapeHtml(item.accuracy)}</span>
         </div>
+        ${reviewBadge(item)}
         <p class="desc">${escapeHtml(item.items)}。${escapeHtml(item.description)}</p>
         <div class="address">
           <i data-lucide="map-pin" aria-hidden="true"></i>
@@ -2105,7 +2368,7 @@
     function candidatePlaces() {
       const keyword = searchInput.value.trim().toLowerCase();
       return places.filter((item) => {
-        const haystack = `${item.name} ${item.group} ${item.category} ${item.area} ${item.items} ${item.description} ${item.address} ${item.price}`.toLowerCase();
+        const haystack = `${item.name} ${item.group} ${item.category} ${item.area} ${item.items} ${item.description} ${item.address} ${item.price} ${reviewSearchText(item)}`.toLowerCase();
         const matchesCity = placeCity(item) === activeCity;
         const matchesGroup = activeGroup === "all" || item.group === activeGroup;
         const matchesCategory = activeCategory === "all" || item.category === activeCategory;
