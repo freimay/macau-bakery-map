@@ -635,7 +635,7 @@
     const cityGroups = {
       macau: ["bread", "pizza"],
       xian: ["paomo"],
-      shanghai: ["shengjian"]
+      shanghai: ["shengjian", "pizza"]
     };
 
     const cityBadges = {
@@ -648,8 +648,8 @@
         subtitle: "切到西安后只显示泡馍/小炒泡馍，最多 20 家。"
       },
       shanghai: {
-        title: "上海生煎精选点",
-        subtitle: "切到上海后只显示生煎馆，最多 20 家。"
+        title: "上海生煎与 Pizza 精选点",
+        subtitle: "切到上海后显示生煎和 Pizza，每类最多 20 家。"
       }
     };
 
@@ -1582,6 +1582,366 @@
         accuracy: "街道定位",
         sourceName: "搜狐上海生煎榜单",
         sourceUrl: "https://www.sohu.com/a/366033225_494737"
+      },
+      {
+        id: "pizza-shanghai-bottega",
+        city: "shanghai",
+        group: "pizza",
+        rank: 1,
+        name: "Bottega (Jing'an)",
+        category: "拿坡里",
+        area: "静安",
+        items: "玛格丽特、Bufala、水牛芝士披萨",
+        description: "北京来沪的人气拿坡里披萨店，主打高温窑炉、豹纹饼边和轻盈湿润的饼芯，适合专门为一张披萨安排一餐。",
+        address: "上海市静安区陕西北路457号1幢1层，近北京西路",
+        price: "人均约 ¥180-280；披萨约 ¥120-180，现场价为准",
+        lat: 31.230867,
+        lng: 121.452621,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/32413/bottega_jing_an_store"
+      },
+      {
+        id: "pizza-shanghai-mammamia",
+        city: "shanghai",
+        group: "pizza",
+        rank: 2,
+        name: "MammaMia (Julu Lu)",
+        category: "拿坡里",
+        area: "静安",
+        items: "Pizza Napoletana、手工意面、提拉米苏",
+        description: "Enzo Carbone 团队的休闲意餐馆，招牌是拿坡里披萨和适合分享的家庭式菜品，氛围比高端意餐轻松。",
+        address: "上海市静安区巨鹿路758号1楼，近富民路",
+        price: "人均约 ¥160-260；披萨现场价为准",
+        lat: 31.220427,
+        lng: 121.451538,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/15943/mammamia_julu_lu"
+      },
+      {
+        id: "pizza-shanghai-homeslice",
+        city: "shanghai",
+        group: "pizza",
+        rank: 3,
+        name: "Homeslice Kitchen (Shankang Li)",
+        category: "纽约切片",
+        area: "静安",
+        items: "纽约切片、酸种饼底、整张披萨",
+        description: "主打纽约风格切片和整张披萨，手工酸种饼底是特色，适合临时想吃一片，也适合朋友分一整张。",
+        address: "上海市静安区陕康里3号楼1层，康定路358号，近陕西北路",
+        price: "切片约 ¥30-45；整张约 ¥160-240，现场价为准",
+        lat: 31.235317,
+        lng: 121.449768,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/21751/homeslice_kangding_lu"
+      },
+      {
+        id: "pizza-shanghai-bella-napoli",
+        city: "shanghai",
+        group: "pizza",
+        rank: 4,
+        name: "Bella Napoli (Changle Lu)",
+        category: "意式老店",
+        area: "静安",
+        items: "玛格丽特、海鲜披萨、经典意面",
+        description: "上海意式披萨老牌选择，长乐路分店位置方便，出品走传统披萨和意面路线，适合想吃稳妥意餐的人。",
+        address: "上海市静安区长乐路946弄，近乌鲁木齐路",
+        price: "人均约 ¥160-260；披萨现场价为准",
+        lat: 31.215742,
+        lng: 121.445496,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/5323/Bella_Napoli_Changle_Lu"
+      },
+      {
+        id: "pizza-shanghai-goodfellas",
+        city: "shanghai",
+        group: "pizza",
+        rank: 5,
+        name: "Goodfellas",
+        category: "外滩意餐",
+        area: "黄浦",
+        items: "经典意式披萨、意面、意大利酒",
+        description: "外滩附近的人气意餐馆，菜单覆盖披萨、意面和海鲜肉类主菜，适合把 Pizza 和外滩路线合并。",
+        address: "上海市黄浦区延安东路7号，近中山东一路",
+        price: "人均约 ¥250-450；披萨现场价为准",
+        lat: 31.232512,
+        lng: 121.491043,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/9848/goodfellas"
+      },
+      {
+        id: "pizza-shanghai-la-strada",
+        city: "shanghai",
+        group: "pizza",
+        rank: 6,
+        name: "La Strada (Anfu Lu)",
+        category: "薄底",
+        area: "徐汇",
+        items: "48小时发酵酸种薄底披萨、沙拉、意式小食",
+        description: "安福路上的轻便披萨店，主打薄底、慢发酵酸种和 Di Fiore Forni 烤炉，适合下午或晚餐随性吃。",
+        address: "上海市徐汇区安福路195号1楼，近乌鲁木齐中路",
+        price: "人均约 ¥120-200；披萨现场价为准",
+        lat: 31.213942,
+        lng: 121.443733,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/4464/La_Strada_shanghai"
+      },
+      {
+        id: "pizza-shanghai-zup",
+        city: "shanghai",
+        group: "pizza",
+        rank: 7,
+        name: "Zup Pizza Bar",
+        category: "酒吧",
+        area: "静安",
+        items: "芝加哥酒馆薄底、切片、整张披萨",
+        description: "主打 Chicago tavern-style 薄底方切披萨，饼底经冷藏发酵，酒吧属性强，适合啤酒配披萨。",
+        address: "上海市静安区陕西北路457号4幢101室，近新闸路",
+        price: "切片约 ¥35-50；整张约 ¥150-240，现场价为准",
+        lat: 31.230118,
+        lng: 121.453041,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/33967/zup_pizza_bar"
+      },
+      {
+        id: "pizza-shanghai-bar-centrale",
+        city: "shanghai",
+        group: "pizza",
+        rank: 8,
+        name: "Bar Centrale",
+        category: "餐酒吧",
+        area: "静安",
+        items: "经典意式披萨、Sunday Pizza Night、意式酒水",
+        description: "Gemma 团队的街角意式餐酒吧，延平路位置热闹，披萨夜口碑稳定，适合轻松聚餐。",
+        address: "上海市静安区延平路135号，近武定路",
+        price: "人均约 ¥120-220；披萨现场价为准",
+        lat: 31.22905,
+        lng: 121.440842,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/13765/bar_central"
+      },
+      {
+        id: "pizza-shanghai-gemma",
+        city: "shanghai",
+        group: "pizza",
+        rank: 9,
+        name: "Gemma",
+        category: "拿坡里",
+        area: "徐汇",
+        items: "拿坡里披萨、手工意面、Gelato",
+        description: "东湖路上更精致的意式披萨餐厅，披萨、手工意面和甜品线都完整，适合正式一点的意餐晚餐。",
+        address: "上海市徐汇区东湖路20号，近淮海中路",
+        price: "人均约 ¥200-320；披萨现场价为准",
+        lat: 31.216169,
+        lng: 121.454941,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/11615/gemma"
+      },
+      {
+        id: "pizza-shanghai-pizza-marzano",
+        city: "shanghai",
+        group: "pizza",
+        rank: 10,
+        name: "Pizza Marzano (Xintiandi)",
+        category: "连锁",
+        area: "黄浦",
+        items: "北京烤鸭披萨、罗马/拿坡里薄底、双人套餐",
+        description: "连锁但出品稳定，新天地店对游客友好；披萨选择多，也适合和商圈行程合并。",
+        address: "上海市黄浦区新天地南里兴业路123弄，近马当路",
+        price: "双人套餐 ¥299 起；单张披萨约 ¥80-150，现场价为准",
+        lat: 31.219316,
+        lng: 121.475655,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/2534/Pizza_Marzano_shanghai"
+      },
+      {
+        id: "pizza-shanghai-palatino",
+        city: "shanghai",
+        group: "pizza",
+        rank: 11,
+        name: "Palatino",
+        category: "罗马",
+        area: "黄浦",
+        items: "罗马风味披萨、意式小菜、红酒",
+        description: "长乐路弄堂里的罗马风味意餐馆，披萨和酒单都适合慢慢吃，座位氛围比街面更安静。",
+        address: "上海市黄浦区长乐路434弄7号，近茂名路",
+        price: "人均约 ¥150-260；披萨现场价为准",
+        lat: 31.220583,
+        lng: 121.459564,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/11554/palatino_roman_cuisine"
+      },
+      {
+        id: "pizza-shanghai-acote",
+        city: "shanghai",
+        group: "pizza",
+        rank: 12,
+        name: "a Cote Cafe & Pizzeria",
+        category: "木火炉",
+        area: "徐汇",
+        items: "木火炉披萨、普罗旺斯葡萄酒、季节甜点",
+        description: "武康庭里的小型披萨店，木火炉披萨和户外座位是重点，适合武康路散步时顺路吃。",
+        address: "上海市徐汇区武康庭1楼，武康路376号，近泰安路",
+        price: "人均约 ¥130-220；披萨现场价为准",
+        lat: 31.206699,
+        lng: 121.439003,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/6125/acote"
+      },
+      {
+        id: "pizza-shanghai-alla-torre",
+        city: "shanghai",
+        group: "pizza",
+        rank: 13,
+        name: "Alla Torre (Lujiazui)",
+        category: "意式",
+        area: "浦东",
+        items: "手工披萨、意面、烤肉",
+        description: "陆家嘴一带的意式餐厅，来自 Latina 团队，披萨、意面和烤制主菜都适合商务或朋友聚餐。",
+        address: "上海市浦东新区陆家嘴环路165号，近浦东南路",
+        price: "人均约 ¥150-260；披萨现场价为准",
+        lat: 31.233463,
+        lng: 121.502495,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/6249/Alla_Torre"
+      },
+      {
+        id: "pizza-shanghai-mercato",
+        city: "shanghai",
+        group: "pizza",
+        rank: 14,
+        name: "Mercato",
+        category: "高端",
+        area: "黄浦",
+        items: "木火炉披萨、松露披萨、Burrata",
+        description: "Jean-Georges 的意式概念餐厅，外滩视野和分享型菜品是卖点，松露披萨很适合多人分食。",
+        address: "上海市黄浦区中山东一路3号6楼，近广东路",
+        price: "人均约 ¥300-500；披萨现场价为准",
+        lat: 31.234301,
+        lng: 121.491028,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/7223/Mercato"
+      },
+      {
+        id: "pizza-shanghai-da-marco",
+        city: "shanghai",
+        group: "pizza",
+        rank: 15,
+        name: "Da Marco (Dong Zhu'anbang Lu)",
+        category: "老牌意餐",
+        area: "长宁",
+        items: "经典披萨、意面、意式主菜",
+        description: "上海外籍社群熟悉的老牌意餐，价格相对友好，适合想吃朴素稳定的披萨和意面。",
+        address: "上海市长宁区东渚安浜路103号1楼，近江苏路",
+        price: "人均约 ¥100-200；披萨现场价为准",
+        lat: 31.218086,
+        lng: 121.434288,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/254/Da_Marco_Italian_Restaurant_shanghai"
+      },
+      {
+        id: "pizza-shanghai-calypso",
+        city: "shanghai",
+        group: "pizza",
+        rank: 16,
+        name: "Calypso Restaurant & Lounge",
+        category: "酒店/高端",
+        area: "静安",
+        items: "拿坡里披萨、手工意面、露台酒廊",
+        description: "静安香格里拉的地中海/意式餐厅，环境设计感强，适合想把披萨、酒廊和商圈约会放在一起的人。",
+        address: "上海市静安区延安中路1218号静安香格里拉，近铜仁路",
+        price: "人均约 ¥250-450；披萨现场价为准",
+        lat: 31.223482,
+        lng: 121.450661,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/10745/calypso"
+      },
+      {
+        id: "pizza-shanghai-pass-residence",
+        city: "shanghai",
+        group: "pizza",
+        rank: 17,
+        name: "PASS RESIDENCE",
+        category: "餐酒馆",
+        area: "黄浦",
+        items: "木火炉披萨、意面、自然酒",
+        description: "巨鹿路的工业风意式餐酒馆，菜单双线集中在披萨和意面，适合想边选酒边吃披萨的人。",
+        address: "上海市黄浦区巨鹿路318号，近茂名南路",
+        price: "人均约 ¥150-280；披萨现场价为准",
+        lat: 31.22282,
+        lng: 121.458984,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/18593/pass_residence_julu_lu"
+      },
+      {
+        id: "pizza-shanghai-senso",
+        city: "shanghai",
+        group: "pizza",
+        rank: 18,
+        name: "SENSO",
+        category: "家庭意式",
+        area: "长宁",
+        items: "手工小食、披萨、炭烤菜",
+        description: "华山路附近的家常意式餐厅，披萨、小份意式小吃和烤制菜都有，适合轻松晚餐。",
+        address: "上海市长宁区华山路1038弄161号1楼，近昭化东路",
+        price: "人均约 ¥150-260；披萨现场价为准",
+        lat: 31.213469,
+        lng: 121.43544,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/17873/senso_zhaohua_dong_lu"
+      },
+      {
+        id: "pizza-shanghai-pomodoro",
+        city: "shanghai",
+        group: "pizza",
+        rank: 19,
+        name: "Pomodoro",
+        category: "露台",
+        area: "静安",
+        items: "经典披萨、意式小菜、午市套餐",
+        description: "武定路 PAC 里的宽敞意餐厅，有较大的露台和完整意式菜单，适合午餐或多人轻松聚。",
+        address: "上海市静安区武定路718弄4栋L1-02/03室，近常德路",
+        price: "主菜多在 ¥178 以下；人均约 ¥150-250",
+        lat: 31.232277,
+        lng: 121.444763,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/33730/pomodoro"
+      },
+      {
+        id: "pizza-shanghai-scarpetta",
+        city: "shanghai",
+        group: "pizza",
+        rank: 20,
+        name: "Scarpetta",
+        category: "意式餐厅",
+        area: "黄浦",
+        items: "披萨、手工意面、烤肉",
+        description: "蒙自路上的小型意式餐厅，披萨、意面和烤制主菜都做，适合生日、约会或想吃完整意餐的一餐。",
+        address: "上海市黄浦区蒙自路33号，近徐家汇路",
+        price: "人均约 ¥200-350；披萨现场价为准",
+        lat: 31.208509,
+        lng: 121.476944,
+        accuracy: "SmartShanghai 坐标",
+        sourceName: "SmartShanghai",
+        sourceUrl: "https://www.smartshanghai.com/venue/7507/scarpetta"
       }
     ];
 
@@ -1661,6 +2021,12 @@
       return `https://www.google.com/maps/search/?api=1&query=${query}`;
     }
 
+    function amapUrl(item) {
+      const city = cityLabels[placeCity(item)];
+      const keyword = encodeURIComponent(`${item.name} ${item.address} ${city}`);
+      return `https://uri.amap.com/search?keyword=${keyword}&city=${encodeURIComponent(city)}`;
+    }
+
     function sourceLink(item) {
       if (!item.sourceUrl) return "";
       return `<a class="link-button secondary" href="${item.sourceUrl}" target="_blank" rel="noreferrer">
@@ -1679,7 +2045,10 @@
           <span class="popup-price">${escapeHtml(item.price)}</span>
           <div class="popup-actions">
             <a class="link-button" href="${navUrl(item)}" target="_blank" rel="noreferrer">
-              <i data-lucide="navigation" aria-hidden="true"></i>导航
+              <i data-lucide="navigation" aria-hidden="true"></i>Google
+            </a>
+            <a class="link-button" href="${amapUrl(item)}" target="_blank" rel="noreferrer">
+              <i data-lucide="route" aria-hidden="true"></i>高德
             </a>
             <a class="link-button secondary" href="https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lng}#map=18/${item.lat}/${item.lng}" target="_blank" rel="noreferrer">
               <i data-lucide="map-pin" aria-hidden="true"></i>OSM
