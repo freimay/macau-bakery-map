@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>澳门面包与 Pizza 地图</title>
+  <title>城市美食地图</title>
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -48,12 +48,14 @@
       grid-template-columns: minmax(340px, 450px) minmax(0, 1fr);
       height: 100vh;
       min-height: 620px;
+      overflow: hidden;
     }
 
     .sidebar {
       display: flex;
       flex-direction: column;
       min-width: 0;
+      min-height: 0;
       background: var(--paper);
       border-right: 1px solid var(--line);
       box-shadow: var(--shadow);
@@ -82,7 +84,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       margin-top: 18px;
     }
@@ -179,6 +181,7 @@
       height: 18px;
     }
 
+    .city-tabs,
     .group-tabs,
     .filters {
       display: flex;
@@ -186,6 +189,7 @@
       gap: 8px;
     }
 
+    .city-tab,
     .group-tab,
     .filter {
       min-height: 34px;
@@ -199,6 +203,7 @@
       cursor: pointer;
     }
 
+    .city-tab[aria-pressed="true"],
     .group-tab[aria-pressed="true"],
     .filter[aria-pressed="true"] {
       border-color: var(--accent);
@@ -207,6 +212,8 @@
     }
 
     .list {
+      flex: 1 1 auto;
+      min-height: 0;
       overflow: auto;
       padding: 14px 18px 10px;
     }
@@ -344,6 +351,7 @@
 
     .map-wrap {
       position: relative;
+      height: 100vh;
       min-width: 0;
       background: #d9e2df;
     }
@@ -470,12 +478,18 @@
       background: var(--pizza);
     }
 
+    .marker.paomo {
+      background: var(--accent);
+      font-size: 13px;
+    }
+
     @media (max-width: 880px) {
       .app {
         grid-template-columns: 1fr;
         grid-template-rows: auto minmax(48vh, 1fr);
         height: auto;
         min-height: 100vh;
+        overflow: visible;
       }
 
       .sidebar {
@@ -506,6 +520,7 @@
 
       .map-wrap,
       #map {
+        height: auto;
         min-height: 58vh;
       }
 
@@ -518,10 +533,6 @@
     @media (max-width: 520px) {
       .summary {
         grid-template-columns: 1fr 1fr;
-      }
-
-      .metric:last-child {
-        grid-column: 1 / -1;
       }
 
       .card-top {
@@ -538,10 +549,10 @@
 </head>
 <body>
   <main class="app">
-    <aside class="sidebar" aria-label="澳门面包与 Pizza 清单">
+    <aside class="sidebar" aria-label="城市美食清单">
       <section class="header">
-        <p class="eyebrow">Macau Food Map</p>
-        <h1>澳门面包与 Pizza 地图</h1>
+        <p class="eyebrow">City Food Map</p>
+        <h1>城市美食地图</h1>
         <div class="summary" aria-label="地图概览">
           <div class="metric">
             <strong id="shopCount">20</strong>
@@ -555,10 +566,18 @@
             <strong id="pizzaCount">12</strong>
             <span>Pizza</span>
           </div>
+          <div class="metric">
+            <strong id="paomoCount">0</strong>
+            <span>泡馍</span>
+          </div>
         </div>
       </section>
 
       <section class="controls" aria-label="筛选">
+        <div class="city-tabs" role="group" aria-label="按城市筛选">
+          <button class="city-tab" type="button" data-city="macau" aria-pressed="true">澳门</button>
+          <button class="city-tab" type="button" data-city="xian" aria-pressed="false">西安</button>
+        </div>
         <div class="search-row">
           <label class="search-box">
             <i data-lucide="search" aria-hidden="true"></i>
@@ -572,20 +591,21 @@
           <button class="group-tab" type="button" data-group="all" aria-pressed="true">全部</button>
           <button class="group-tab" type="button" data-group="bread" aria-pressed="false">面包</button>
           <button class="group-tab" type="button" data-group="pizza" aria-pressed="false">Pizza</button>
+          <button class="group-tab" type="button" data-group="paomo" aria-pressed="false">泡馍</button>
         </div>
         <div class="filters" id="categoryFilters" role="group" aria-label="按类型筛选"></div>
       </section>
 
       <section class="list" id="placeList" aria-live="polite"></section>
       <p class="empty" id="emptyState">没有匹配的店铺。</p>
-      <p class="status-line" id="limitStatus">当前显示：面包 8 家，Pizza 12 家。每类最多显示 20 家。</p>
+      <p class="status-line" id="limitStatus">当前显示：面包 8 家，Pizza 12 家，泡馍 0 家。每类最多显示 20 家。</p>
       <p class="footnote">价格为公开资料整理的参考价，现场价格和供应以门店为准。含“参考定位”的标记为按地址定位到楼宇或街区。</p>
     </aside>
 
-    <section class="map-wrap" aria-label="澳门面包与 Pizza 地图">
+    <section class="map-wrap" aria-label="城市美食地图">
       <div class="map-badge">
-        <strong>澳门面包与 Pizza 精选点</strong>
-        <span>每类最多显示 20 家，按推荐优先级排序。</span>
+        <strong id="mapBadgeTitle">澳门面包与 Pizza 精选点</strong>
+        <span id="mapBadgeSubtitle">每类最多显示 20 家，按推荐优先级排序。</span>
       </div>
       <div id="map"></div>
     </section>
@@ -595,9 +615,36 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script>
     const MAX_PER_GROUP = 20;
+    const cityLabels = {
+      macau: "澳门",
+      xian: "西安"
+    };
+
+    const cityGroups = {
+      macau: ["bread", "pizza"],
+      xian: ["paomo"]
+    };
+
+    const cityBadges = {
+      macau: {
+        title: "澳门面包与 Pizza 精选点",
+        subtitle: "澳门默认显示面包和 Pizza，每类最多 20 家。"
+      },
+      xian: {
+        title: "西安泡馍精选点",
+        subtitle: "切到西安后只显示泡馍/小炒泡馍，最多 20 家。"
+      }
+    };
+
+    const cityViews = {
+      macau: { center: [22.174, 113.548], zoom: 13 },
+      xian: { center: [34.262, 108.939], zoom: 14 }
+    };
+
     const groupLabels = {
       bread: "面包",
-      pizza: "Pizza"
+      pizza: "Pizza",
+      paomo: "泡馍"
     };
 
     const places = [
@@ -940,6 +987,222 @@
         accuracy: "街道定位",
         sourceName: "LifeMag",
         sourceUrl: "https://lifemag.cyberctm.com/zh_TW/blog/Lifemagfoodie/10919/%E3%80%90Macau%20Best%E3%80%91%E4%B8%80%E8%A9%A6%E4%BB%A4%E4%BD%A0%E5%9B%9E%E5%91%B3%E7%84%A1%E7%AA%AE%EF%BC%8C5%E9%96%93%E5%BF%85%E8%A9%A6%E5%9C%B0%E9%81%93%E8%96%84%E9%A4%85%E6%8E%A8%E4%BB%8B%EF%BC%81"
+      },
+      {
+        id: "paomo-tongshengxiang",
+        city: "xian",
+        group: "paomo",
+        rank: 1,
+        name: "同盛祥饭庄",
+        category: "老字号",
+        area: "钟鼓楼",
+        items: "牛羊肉泡馍、精品泡馍、糖蒜",
+        description: "中华老字号，位置就在钟鼓楼商圈，游客友好，适合第一次吃泡馍时体验标准流程。",
+        address: "西安市莲湖区西大街5号钟鼓楼广场",
+        price: "人均约 ¥37；精品/优质泡馍现场价为准",
+        lat: 34.2618590,
+        lng: 108.9405276,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-mahong",
+        city: "xian",
+        group: "paomo",
+        rank: 2,
+        name: "马洪小炒泡馍",
+        category: "小炒泡馍",
+        area: "回坊",
+        items: "牛肉小炒泡馍、羊肉小炒泡馍、糖蒜",
+        description: "回坊小炒泡馍代表店，酸辣味更明显，适合想吃比传统汤泡馍更重口的一餐。",
+        address: "西安市莲湖区北广济街一带",
+        price: "人均约 ¥30；小炒泡馍单碗以门店为准",
+        lat: 34.2684528,
+        lng: 108.9367335,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-laomijia-dayu",
+        city: "xian",
+        group: "paomo",
+        rank: 3,
+        name: "老米家大雨泡馍",
+        category: "羊肉泡馍",
+        area: "回坊",
+        items: "羊肉泡馍、牛肉泡馍、优质泡馍",
+        description: "西羊市一带的高人气泡馍店，游客和本地食客都多，羊肉汤香和馍筋是看点。",
+        address: "西安市莲湖区西羊市127号附近",
+        price: "人均约 ¥40；普通/优质按门店菜单",
+        lat: 34.2647329,
+        lng: 108.9365135,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-guoyuanzhai",
+        city: "xian",
+        group: "paomo",
+        rank: 4,
+        name: "果渊斋米家泡馍",
+        category: "老字号",
+        area: "回坊",
+        items: "牛羊肉泡馍、优质泡馍、小炒",
+        description: "北广济街上的老店，口味厚实，适合想避开最热闹主街但仍在回坊范围内用餐。",
+        address: "西安市莲湖区北广济街277号",
+        price: "人均约 ¥46",
+        lat: 34.2680975,
+        lng: 108.9343463,
+        accuracy: "OSM 节点",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-liuxin",
+        city: "xian",
+        group: "paomo",
+        rank: 5,
+        name: "刘信牛羊肉泡馍",
+        category: "牛羊肉泡馍",
+        area: "洒金桥",
+        items: "牛肉泡馍、羊肉泡馍、凉菜",
+        description: "洒金桥一带常被推荐的泡馍店，适合和洒金桥小吃路线一起安排。",
+        address: "西安市莲湖区洒金桥129号附近",
+        price: "人均约 ¥38",
+        lat: 34.2679688,
+        lng: 108.9280213,
+        accuracy: "街区定位",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-laosunjia",
+        city: "xian",
+        group: "paomo",
+        rank: 6,
+        name: "老孙家饭庄",
+        category: "老字号",
+        area: "东关",
+        items: "牛羊肉泡馍、葫芦头泡馍、清真菜",
+        description: "西安泡馍老字号之一，环境比回坊小店更正式，适合多人正餐。",
+        address: "西安市碑林区东关正街78号",
+        price: "人均约 ¥52",
+        lat: 34.2607899,
+        lng: 108.9711760,
+        accuracy: "街道定位",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-yizhenlou",
+        city: "xian",
+        group: "paomo",
+        rank: 7,
+        name: "一真楼",
+        category: "羊肉泡馍",
+        area: "回坊",
+        items: "羊肉泡馍、牛肉泡馍、粉丝汤",
+        description: "大皮院附近的回坊老味道，适合在鼓楼、北院门一线逛吃时顺路。",
+        address: "西安市莲湖区大皮院一带",
+        price: "人均约 ¥29",
+        lat: 34.2660734,
+        lng: 108.9363502,
+        accuracy: "街区定位",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-laowujia",
+        city: "xian",
+        group: "paomo",
+        rank: 8,
+        name: "老乌家特色小炒泡馍",
+        category: "小炒泡馍",
+        area: "回坊",
+        items: "普通小炒、优质小炒泡馍、糖蒜",
+        description: "二十年老店，主打小炒泡馍，酸辣适口，也可以选择自己掰馍或机器绞馍。",
+        address: "西安市莲湖区回民街大皮院91号",
+        price: "大众点评/去哪儿参考人均约 ¥28；Trip.com 评论提到人均约 ¥60",
+        lat: 34.2660734,
+        lng: 108.9363502,
+        accuracy: "街区定位",
+        sourceName: "Trip.com",
+        sourceUrl: "https://gs.ctrip.com/html5/you/foods/fooddetail/7/14151467.html"
+      },
+      {
+        id: "paomo-mafeng",
+        city: "xian",
+        group: "paomo",
+        rank: 9,
+        name: "马峰小炒",
+        category: "小炒泡馍",
+        area: "回坊",
+        items: "小炒泡馍、熟肉小炒、生肉小炒",
+        description: "小学习巷一带的进阶小炒泡馍选择，适合已经吃过传统泡馍、想换成酸辣小炒的人。",
+        address: "西安市莲湖区小学习巷中段",
+        price: "人均约 ¥35-50；现场菜单为准",
+        lat: 34.2623324,
+        lng: 108.9299552,
+        accuracy: "街道定位",
+        sourceName: "新浪泡馍指南",
+        sourceUrl: "https://fashion.sina.cn/2017-04-24/detail-ifyepsec0006998.d.html?vt=4"
+      },
+      {
+        id: "paomo-laobaijia",
+        city: "xian",
+        group: "paomo",
+        rank: 10,
+        name: "老白家泡馍",
+        category: "回坊小店",
+        area: "回坊",
+        items: "牛羊肉泡馍、肉夹馍、糖蒜",
+        description: "北院门一带的回坊小店，位置方便，适合把泡馍和肉夹馍一起安排。",
+        address: "西安市莲湖区北院门步行街",
+        price: "泡馍价格以现场为准；肉夹馍点评参考约 ¥15",
+        lat: 34.2633077,
+        lng: 108.9389054,
+        accuracy: "OSM 节点",
+        sourceName: "Tripadvisor",
+        sourceUrl: "https://cn.tripadvisor.com/Restaurant_Review-g298557-d4862113-Reviews-Lao_BaiJia_PaoMo_Guan-Xi_an_Shaanxi.html"
+      },
+      {
+        id: "paomo-laoliujia",
+        city: "xian",
+        group: "paomo",
+        rank: 11,
+        name: "老刘家泡馍馆",
+        category: "牛羊肉泡馍",
+        area: "回坊",
+        items: "牛肉泡馍、羊肉泡馍、优质泡馍",
+        description: "北广济街上被多份榜单提到的泡馍馆，价格友好，适合想吃基础款牛羊肉泡馍。",
+        address: "西安市莲湖区北广济街101号",
+        price: "人均约 ¥29",
+        lat: 34.2661000,
+        lng: 108.9353000,
+        accuracy: "参考定位",
+        sourceName: "搜狐泡馍榜单",
+        sourceUrl: "https://www.sohu.com/a/974087745_120104414"
+      },
+      {
+        id: "paomo-maerli",
+        city: "xian",
+        group: "paomo",
+        rank: 12,
+        name: "马尔里夜宵泡馍",
+        category: "夜宵",
+        area: "回坊",
+        items: "夜宵泡馍、牛羊肉泡馍、小炒",
+        description: "庙后街一带的夜宵泡馍选择，适合晚间逛完回坊后再补一碗热汤。",
+        address: "西安市莲湖区庙后街一带",
+        price: "人均约 ¥30-45；夜宵供应以现场为准",
+        lat: 34.2647339,
+        lng: 108.9296946,
+        accuracy: "街区定位",
+        sourceName: "本地攻略汇总",
+        sourceUrl: "https://m.xa.bendibao.com/meishi/51898_3.shtm"
       }
     ];
 
@@ -958,8 +1221,10 @@
     const searchInput = document.getElementById("searchInput");
     const fitButton = document.getElementById("fitButton");
     const categoryFilters = document.getElementById("categoryFilters");
+    const cityButtons = Array.from(document.querySelectorAll(".city-tab"));
     const groupButtons = Array.from(document.querySelectorAll(".group-tab"));
     const markers = new Map();
+    let activeCity = "macau";
     let activeGroup = "all";
     let activeCategory = "all";
     let activeId = null;
@@ -980,12 +1245,28 @@
     }
 
     function byRank(a, b) {
-      if (a.group !== b.group) return a.group.localeCompare(b.group);
+      if (placeCity(a) !== placeCity(b)) return placeCity(a).localeCompare(placeCity(b));
+      if (a.group !== b.group) {
+        return cityGroups[activeCity].indexOf(a.group) - cityGroups[activeCity].indexOf(b.group);
+      }
       return a.rank - b.rank;
     }
 
+    function placeCity(item) {
+      return item.city || "macau";
+    }
+
+    function activeGroups() {
+      return cityGroups[activeCity] || [];
+    }
+
     function markerIcon(item) {
-      const label = item.group === "pizza" ? "P" : "B";
+      const labels = {
+        bread: "B",
+        pizza: "P",
+        paomo: "馍"
+      };
+      const label = labels[item.group] || "?";
       return L.divIcon({
         className: "",
         html: `<div class="marker ${item.group}"><span>${label}</span></div>`,
@@ -996,7 +1277,7 @@
     }
 
     function navUrl(item) {
-      const query = encodeURIComponent(`${item.name} ${item.address} 澳门`);
+      const query = encodeURIComponent(`${item.name} ${item.address} ${cityLabels[placeCity(item)]}`);
       return `https://www.google.com/maps/search/?api=1&query=${query}`;
     }
 
@@ -1076,10 +1357,11 @@
       const keyword = searchInput.value.trim().toLowerCase();
       return places.filter((item) => {
         const haystack = `${item.name} ${item.group} ${item.category} ${item.area} ${item.items} ${item.description} ${item.address} ${item.price}`.toLowerCase();
+        const matchesCity = placeCity(item) === activeCity;
         const matchesGroup = activeGroup === "all" || item.group === activeGroup;
         const matchesCategory = activeCategory === "all" || item.category === activeCategory;
         const matchesKeyword = !keyword || haystack.includes(keyword);
-        return matchesGroup && matchesCategory && matchesKeyword;
+        return matchesCity && matchesGroup && matchesCategory && matchesKeyword;
       }).sort(byRank);
     }
 
@@ -1088,7 +1370,7 @@
         return items.slice(0, MAX_PER_GROUP);
       }
 
-      return ["bread", "pizza"].flatMap((group) => {
+      return activeGroups().flatMap((group) => {
         return items.filter((item) => item.group === group).slice(0, MAX_PER_GROUP);
       });
     }
@@ -1098,8 +1380,19 @@
     }
 
     function categoryOptions() {
-      const scope = activeGroup === "all" ? places : places.filter((item) => item.group === activeGroup);
+      const cityPlaces = places.filter((item) => placeCity(item) === activeCity);
+      const scope = activeGroup === "all" ? cityPlaces : cityPlaces.filter((item) => item.group === activeGroup);
       return Array.from(new Set(scope.map((item) => item.category)));
+    }
+
+    function renderGroupTabs() {
+      const groups = activeGroups();
+      groupButtons.forEach((button) => {
+        const group = button.dataset.group;
+        const available = group === "all" || groups.includes(group);
+        button.hidden = !available;
+        button.setAttribute("aria-pressed", String(group === activeGroup));
+      });
     }
 
     function renderCategoryFilters() {
@@ -1135,15 +1428,25 @@
     function updateCounts(visible) {
       const breadCount = visible.filter((item) => item.group === "bread").length;
       const pizzaCount = visible.filter((item) => item.group === "pizza").length;
+      const paomoCount = visible.filter((item) => item.group === "paomo").length;
       document.getElementById("shopCount").textContent = visible.length;
       document.getElementById("breadCount").textContent = breadCount;
       document.getElementById("pizzaCount").textContent = pizzaCount;
+      document.getElementById("paomoCount").textContent = paomoCount;
       document.getElementById("limitStatus").textContent =
-        `当前显示：面包 ${breadCount} 家，Pizza ${pizzaCount} 家。每类最多显示 ${MAX_PER_GROUP} 家。`;
+        `当前显示：面包 ${breadCount} 家，Pizza ${pizzaCount} 家，泡馍 ${paomoCount} 家。每类最多显示 ${MAX_PER_GROUP} 家。`;
+    }
+
+    function updateCityBadge() {
+      const badge = cityBadges[activeCity];
+      document.getElementById("mapBadgeTitle").textContent = badge.title;
+      document.getElementById("mapBadgeSubtitle").textContent = badge.subtitle;
     }
 
     function render() {
+      renderGroupTabs();
       renderCategoryFilters();
+      updateCityBadge();
       const visible = visiblePlaces();
       const visibleIds = new Set(visible.map((item) => item.id));
       listEl.innerHTML = "";
@@ -1159,7 +1462,13 @@
 
       if (visible.length) {
         const bounds = L.latLngBounds(visible.map((item) => [item.lat, item.lng]));
-        map.fitBounds(bounds, { padding: [42, 42], maxZoom: 15 });
+        const isDefaultCityView = activeGroup === "all" && activeCategory === "all" && !searchInput.value.trim();
+        if (isDefaultCityView) {
+          const view = cityViews[activeCity];
+          map.setView(view.center, view.zoom, { animate: false });
+        } else {
+          map.fitBounds(bounds, { padding: [42, 42], maxZoom: 15 });
+        }
       }
 
       if (!visibleIds.has(activeId)) {
@@ -1179,13 +1488,23 @@
 
     searchInput.addEventListener("input", render);
 
+    cityButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeCity = button.dataset.city;
+        activeGroup = "all";
+        activeCategory = "all";
+        searchInput.value = "";
+        cityButtons.forEach((entry) => {
+          entry.setAttribute("aria-pressed", String(entry === button));
+        });
+        render();
+      });
+    });
+
     groupButtons.forEach((button) => {
       button.addEventListener("click", () => {
         activeGroup = button.dataset.group;
         activeCategory = "all";
-        groupButtons.forEach((entry) => {
-          entry.setAttribute("aria-pressed", String(entry === button));
-        });
         render();
       });
     });
@@ -1194,13 +1513,16 @@
       searchInput.value = "";
       activeGroup = "all";
       activeCategory = "all";
-      groupButtons.forEach((entry) => {
-        entry.setAttribute("aria-pressed", String(entry.dataset.group === "all"));
-      });
       render();
     });
 
     render();
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        map.invalidateSize();
+        render();
+      }, 250);
+    });
   </script>
 </body>
 </html>
