@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>澳门值得买的面包地图</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      --ink: #20201d;
+      --muted: #69645c;
+      --line: #ded8ce;
+      --paper: #fffaf1;
+      --panel: #fffdf8;
+      --accent: #c9492f;
+      --accent-dark: #8f2f22;
+      --fresh: #27855f;
+      --blue: #276f9f;
+      --shadow: 0 18px 45px rgba(65, 44, 22, .15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", system-ui, sans-serif;
+      background: #efe7d8;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+      height: 100vh;
+      min-height: 620px;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      z-index: 500;
+    }
+
+    .header {
+      padding: 24px 24px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent-dark);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 36px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid #e5dbcd;
+      border-radius: 8px;
+      background: #fff6e8;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 250, 241, .92);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      color: #8c8173;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 12px 0 40px;
+      border: 1px solid #d6ccbe;
+      border-radius: 8px;
+      color: var(--ink);
+      font: inherit;
+      background: var(--panel);
+      outline: none;
+    }
+
+    input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(201, 73, 47, .16);
+    }
+
+    .icon-button {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid #d6ccbe;
+      border-radius: 8px;
+      color: var(--accent-dark);
+      background: var(--panel);
+      cursor: pointer;
+    }
+
+    .icon-button:hover,
+    .icon-button:focus-visible {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(201, 73, 47, .14);
+    }
+
+    .icon-button i,
+    .link-button i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid #d6ccbe;
+      border-radius: 999px;
+      color: #4e4740;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--panel);
+      cursor: pointer;
+    }
+
+    .filter[aria-pressed="true"] {
+      border-color: var(--accent);
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .list {
+      overflow: auto;
+      padding: 14px 18px 20px;
+    }
+
+    .empty {
+      display: none;
+      margin: 14px 0;
+      padding: 18px;
+      border: 1px dashed #d6ccbe;
+      border-radius: 8px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, .44);
+    }
+
+    .bakery-card {
+      width: 100%;
+      margin: 0 0 12px;
+      padding: 16px;
+      border: 1px solid #e0d6c7;
+      border-radius: 8px;
+      text-align: left;
+      color: inherit;
+      background: var(--panel);
+      cursor: pointer;
+      transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
+    }
+
+    .bakery-card:hover,
+    .bakery-card:focus-visible,
+    .bakery-card.active {
+      border-color: rgba(201, 73, 47, .75);
+      box-shadow: 0 12px 28px rgba(68, 44, 23, .12);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .card-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .card-top h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .price {
+      justify-self: end;
+      max-width: 140px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: right;
+      background: #fde6d7;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      color: #325d4e;
+      font-size: 12px;
+      font-weight: 700;
+      background: #e7f3eb;
+    }
+
+    .tag.area {
+      color: #225372;
+      background: #e1f0f8;
+    }
+
+    .desc {
+      margin: 0;
+      color: #4b463f;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .address {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 7px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .address i {
+      width: 16px;
+      height: 16px;
+      margin-top: 1px;
+      color: var(--accent);
+    }
+
+    .map-wrap {
+      position: relative;
+      min-width: 0;
+      background: #d9e2df;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+      z-index: 1;
+    }
+
+    .map-badge {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      z-index: 450;
+      max-width: min(520px, calc(100% - 36px));
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, .64);
+      border-radius: 8px;
+      background: rgba(255, 253, 248, .94);
+      box-shadow: 0 14px 34px rgba(30, 30, 30, .14);
+      backdrop-filter: blur(10px);
+    }
+
+    .map-badge strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .map-badge span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 8px;
+    }
+
+    .popup {
+      width: min(280px, 70vw);
+    }
+
+    .popup h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .popup p {
+      margin: 6px 0;
+      color: #4f4942;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .popup .popup-price {
+      display: inline-flex;
+      margin-top: 8px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+      background: #fde6d7;
+    }
+
+    .popup-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 36px;
+      padding: 0 10px;
+      border: 1px solid #d6ccbe;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      background: var(--accent);
+    }
+
+    .link-button.secondary {
+      color: var(--accent-dark);
+      background: #fffaf1;
+    }
+
+    .marker {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 3px solid #fff;
+      border-radius: 50% 50% 50% 8px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      background: var(--accent);
+      box-shadow: 0 8px 18px rgba(42, 33, 24, .28);
+      transform: rotate(-45deg);
+    }
+
+    .marker span {
+      transform: rotate(45deg);
+    }
+
+    .marker.classic {
+      background: var(--accent);
+    }
+
+    .marker.euro {
+      background: var(--fresh);
+    }
+
+    .marker.value {
+      background: var(--blue);
+    }
+
+    .footnote {
+      margin: 8px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 880px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(48vh, 1fr);
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        max-height: none;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .header {
+        padding: 20px 18px 14px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .list {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 16px;
+      }
+
+      .bakery-card {
+        flex: 0 0 min(310px, 86vw);
+        margin-bottom: 0;
+      }
+
+      .map-wrap,
+      #map {
+        min-height: 58vh;
+      }
+
+      .map-badge {
+        top: auto;
+        bottom: 18px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .metric:last-child {
+        grid-column: 1 / -1;
+      }
+
+      .card-top {
+        grid-template-columns: 1fr;
+      }
+
+      .price {
+        justify-self: start;
+        max-width: 100%;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar" aria-label="澳门面包店清单">
+      <section class="header">
+        <p class="eyebrow">Macau Bakery Map</p>
+        <h1>澳门值得买的面包地图</h1>
+        <div class="summary" aria-label="地图概览">
+          <div class="metric">
+            <strong id="shopCount">8</strong>
+            <span>家店</span>
+          </div>
+          <div class="metric">
+            <strong>3</strong>
+            <span>片区</span>
+          </div>
+          <div class="metric">
+            <strong>MOP1+</strong>
+            <span>参考价</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="筛选">
+        <div class="search-row">
+          <label class="search-box">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <input id="searchInput" type="search" placeholder="搜索店名、面包、地址" autocomplete="off">
+          </label>
+          <button id="fitButton" class="icon-button" type="button" title="显示全部店铺" aria-label="显示全部店铺">
+            <i data-lucide="scan-search" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="filters" role="group" aria-label="按类型筛选">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button class="filter" type="button" data-filter="欧包">欧包</button>
+          <button class="filter" type="button" data-filter="葡挞">葡挞</button>
+          <button class="filter" type="button" data-filter="老字号">老字号</button>
+          <button class="filter" type="button" data-filter="平价">平价</button>
+        </div>
+      </section>
+
+      <section class="list" id="bakeryList" aria-live="polite"></section>
+      <p class="empty" id="emptyState">没有匹配的面包店。</p>
+      <p class="footnote">价格为公开资料整理的参考价，现场价格和供应以门店为准。含“参考定位”的标记为按地址定位到楼宇或街区。</p>
+    </aside>
+
+    <section class="map-wrap" aria-label="澳门面包地图">
+      <div class="map-badge">
+        <strong>点标记查看店名、面包种类、描述、地址和价格</strong>
+        <span>地图使用 OpenStreetMap。导航按钮会按店名和地址打开搜索。</span>
+      </div>
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const bakeries = [
+      {
+        id: "nata",
+        name: "Nata Bakery & Cafe",
+        category: "欧包",
+        area: "氹仔",
+        type: "euro",
+        breads: "葡式面包、酸种、法棍、葡式牛角包",
+        description: "适合买回酒店做早餐；酸种用自家酵母，慢发酵，面包线比普通伴手礼更扎实。",
+        address: "氹仔奥林匹克大马路568号华南大厦3楼",
+        price: "葡式面包 MOP9；酸种 MOP49；法棍 MOP31；葡式牛角包 MOP13",
+        lat: 22.1562799,
+        lng: 113.5586775,
+        accuracy: "楼宇定位"
+      },
+      {
+        id: "lord-stow",
+        name: "安德鲁饼店 Lord Stow's",
+        category: "葡挞",
+        area: "氹仔",
+        type: "classic",
+        breads: "葡式蛋挞、欧式糕饼面包",
+        description: "澳门葡挞代表店，官也街店适合顺路买热的；路环总店更有老店感。",
+        address: "官也街店：氹仔官也街；另有路环挞沙街1号总店",
+        price: "蛋挞约 MOP13/个，6个约 MOP75",
+        lat: 22.1534557,
+        lng: 113.5571160,
+        accuracy: "OSM 节点"
+      },
+      {
+        id: "bamu",
+        name: "Bamu Bakery & Coffee",
+        category: "葡挞",
+        area: "澳门半岛",
+        type: "classic",
+        breads: "葡挞、酥皮类",
+        description: "蛋挞皮薄脆，蛋馅足，甜度相对克制；适合在塔石一带顺路买。",
+        address: "沙嘉都喇贾罢丽街16A地下H",
+        price: "葡挞约 MOP12/个",
+        lat: 22.1998000,
+        lng: 113.5460364,
+        accuracy: "街道定位"
+      },
+      {
+        id: "jim-sai",
+        name: "占西饼店 Jim Sai Padarias",
+        category: "老字号",
+        area: "澳门半岛",
+        type: "classic",
+        breads: "沙翁、葡挞、鸡批、鸡尾包",
+        description: "下环老字号，沙翁和鸡批有怀旧港澳西饼风味，通常中午后更容易买到热出炉。",
+        address: "下环风顺堂街33号丰明大厦地铺",
+        price: "沙翁约 MOP7-8；葡挞约 MOP8",
+        lat: 22.1908220,
+        lng: 113.5374481,
+        accuracy: "OSM 节点"
+      },
+      {
+        id: "anak",
+        name: "Anak Philippine Bread",
+        category: "平价",
+        area: "澳门半岛",
+        type: "value",
+        breads: "Pandesal、芝士面包、叉烧面包",
+        description: "菲律宾街平价面包店，小面包外脆内软，价格友好，适合扫几袋当夜宵。",
+        address: "红窗门街115号 Edificio Pou Fat",
+        price: "Pandesal 小面包约 MOP1/个",
+        lat: 22.1934476,
+        lng: 113.5377037,
+        accuracy: "楼宇定位"
+      },
+      {
+        id: "brownstudy",
+        name: "BrownStudy Bakery 目中烘焙",
+        category: "欧包",
+        area: "氹仔",
+        type: "euro",
+        breads: "AOP 原味牛角、杏仁牛角、榛子朱古力布里欧",
+        description: "氹仔村咖啡烘焙店，牛角包层次漂亮，适合拍照、堂食和顺手买甜面包。",
+        address: "米也马嘉礼前地1-7号",
+        price: "原味牛角 MOP28；杏仁牛角 MOP42；布里欧 MOP68",
+        lat: 22.1535593,
+        lng: 113.5566736,
+        accuracy: "街区定位"
+      },
+      {
+        id: "elysee",
+        name: "Élysée Bakery 香榭里",
+        category: "欧包",
+        area: "澳门半岛",
+        type: "euro",
+        breads: "可颂、Pain au Chocolat、法式面包",
+        description: "法式面包店，主打法棍、可颂和糕点；想买可颂、巧克力可颂可以优先看这里。",
+        address: "高地乌街52B；氹仔奥林匹克大马路600号等",
+        price: "可颂/巧克力可颂常见约 MOP13-22",
+        lat: 22.1920304,
+        lng: 113.5426892,
+        accuracy: "OSM 节点"
+      },
+      {
+        id: "lafayette",
+        name: "老佛爷饼店 Lafayette",
+        category: "老字号",
+        area: "澳门半岛",
+        type: "classic",
+        breads: "巨型牛角包、朱古力牛角包",
+        description: "老派高质西饼店，牛角包体积大、酥香，是澳门本地人常提的面包店。",
+        address: "新八佰伴7楼；葡京酒店内也有相关饼店",
+        price: "牛角包旧点评约 MOP15；朱古力牛角包约 MOP24",
+        lat: 22.1910023,
+        lng: 113.5404041,
+        accuracy: "楼宇定位"
+      }
+    ];
+
+    const map = L.map("map", {
+      zoomControl: true,
+      scrollWheelZoom: true
+    }).setView([22.175, 113.548], 13);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const listEl = document.getElementById("bakeryList");
+    const emptyEl = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const fitButton = document.getElementById("fitButton");
+    const filterButtons = Array.from(document.querySelectorAll(".filter"));
+    const markers = new Map();
+    let activeFilter = "all";
+    let activeId = null;
+
+    function refreshIcons() {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function markerIcon(item) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="marker ${item.type}"><span>${item.category.slice(0, 1)}</span></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -30]
+      });
+    }
+
+    function navUrl(item) {
+      const query = encodeURIComponent(`${item.name} ${item.address} 澳门`);
+      return `https://www.google.com/maps/search/?api=1&query=${query}`;
+    }
+
+    function popupHtml(item) {
+      return `
+        <div class="popup">
+          <h3>${escapeHtml(item.name)}</h3>
+          <p><strong>种类：</strong>${escapeHtml(item.breads)}</p>
+          <p>${escapeHtml(item.description)}</p>
+          <p><strong>地址：</strong>${escapeHtml(item.address)}</p>
+          <p><strong>定位：</strong>${escapeHtml(item.accuracy)}</p>
+          <span class="popup-price">${escapeHtml(item.price)}</span>
+          <div class="popup-actions">
+            <a class="link-button" href="${navUrl(item)}" target="_blank" rel="noreferrer">
+              <i data-lucide="navigation" aria-hidden="true"></i>导航
+            </a>
+            <a class="link-button secondary" href="https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lng}#map=18/${item.lat}/${item.lng}" target="_blank" rel="noreferrer">
+              <i data-lucide="map-pin" aria-hidden="true"></i>OSM
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function makeCard(item) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bakery-card";
+      button.dataset.id = item.id;
+      button.innerHTML = `
+        <div class="card-top">
+          <h2>${escapeHtml(item.name)}</h2>
+          <span class="price">${escapeHtml(item.price)}</span>
+        </div>
+        <div class="tag-row">
+          <span class="tag">${escapeHtml(item.category)}</span>
+          <span class="tag area">${escapeHtml(item.area)}</span>
+          <span class="tag area">${escapeHtml(item.accuracy)}</span>
+        </div>
+        <p class="desc">${escapeHtml(item.breads)}。${escapeHtml(item.description)}</p>
+        <div class="address">
+          <i data-lucide="map-pin" aria-hidden="true"></i>
+          <span>${escapeHtml(item.address)}</span>
+        </div>
+      `;
+      button.addEventListener("click", () => focusBakery(item.id, true));
+      return button;
+    }
+
+    function focusBakery(id, pan) {
+      activeId = id;
+      const item = bakeries.find((entry) => entry.id === id);
+      const marker = markers.get(id);
+      if (!item || !marker) return;
+
+      document.querySelectorAll(".bakery-card").forEach((card) => {
+        card.classList.toggle("active", card.dataset.id === id);
+      });
+
+      if (pan) {
+        map.setView([item.lat, item.lng], 17, { animate: true });
+      }
+      marker.openPopup();
+      requestAnimationFrame(refreshIcons);
+    }
+
+    function filteredBakeries() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      return bakeries.filter((item) => {
+        const haystack = `${item.name} ${item.category} ${item.area} ${item.breads} ${item.description} ${item.address} ${item.price}`.toLowerCase();
+        const matchesFilter = activeFilter === "all" || item.category === activeFilter;
+        const matchesKeyword = !keyword || haystack.includes(keyword);
+        return matchesFilter && matchesKeyword;
+      });
+    }
+
+    function render() {
+      const visible = filteredBakeries();
+      listEl.innerHTML = "";
+      visible.forEach((item) => listEl.appendChild(makeCard(item)));
+      emptyEl.style.display = visible.length ? "none" : "block";
+      document.getElementById("shopCount").textContent = visible.length;
+
+      markers.forEach((marker, id) => {
+        const itemVisible = visible.some((item) => item.id === id);
+        if (itemVisible && !map.hasLayer(marker)) marker.addTo(map);
+        if (!itemVisible && map.hasLayer(marker)) marker.remove();
+      });
+
+      if (visible.length) {
+        const bounds = L.latLngBounds(visible.map((item) => [item.lat, item.lng]));
+        map.fitBounds(bounds, { padding: [42, 42], maxZoom: 15 });
+      }
+
+      if (!visible.some((item) => item.id === activeId)) {
+        activeId = null;
+      }
+
+      requestAnimationFrame(refreshIcons);
+    }
+
+    bakeries.forEach((item) => {
+      const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item) })
+        .bindPopup(popupHtml(item));
+      marker.on("click", () => focusBakery(item.id, false));
+      markers.set(item.id, marker);
+      marker.addTo(map);
+    });
+
+    searchInput.addEventListener("input", render);
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        filterButtons.forEach((entry) => {
+          entry.setAttribute("aria-pressed", String(entry === button));
+        });
+        render();
+      });
+    });
+
+    fitButton.addEventListener("click", () => {
+      searchInput.value = "";
+      activeFilter = "all";
+      filterButtons.forEach((entry) => {
+        entry.setAttribute("aria-pressed", String(entry.dataset.filter === "all"));
+      });
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
